@@ -1,21 +1,36 @@
-// Ejecutar el cálculo inicial apenas cargue la página
+// Removemos el cálculo automático inicial para respetar que empiece vacío
 document.addEventListener("DOMContentLoaded", () => {
-    generarPlanPagos();
+    // La interfaz muestra el mensaje de bienvenida y espera la acción del usuario
 });
 
-// Variable global para guardar el estado y reutilizarlo al exportar a Excel
 let cachePlanPagos = [];
 let variablesGlobales = {};
 
 function generarPlanPagos() {
     // Captura de datos desde el HTML
-    const monto = parseFloat(document.getElementById("monto").value) || 0;
-    const tasaMensual = (parseFloat(document.getElementById("tasa").value) || 0) / 100;
-    const plazoPactado = parseInt(document.getElementById("plazo").value) || 0;
-    const valorPrima = parseFloat(document.getElementById("prima").value) || 0;
+    const montoRaw = document.getElementById("monto").value;
+    const tasaRaw = document.getElementById("tasa").value;
+    const plazoRaw = document.getElementById("plazo").value;
+    const valorPrimaRaw = document.getElementById("prima").value;
     const aplicarPrimas = document.getElementById("aplicar_primas").checked;
 
-    // Fórmula PMT / PAGO (Cuota Fija Sistema Francés)
+    // Validación básica preventiva por si el usuario deja campos obligatorios en blanco
+    if (!montoRaw || !tasaRaw || !plazoRaw) {
+        alert("Por favor, completa los campos de Monto, Tasa y Plazo para poder realizar la simulación.");
+        return;
+    }
+
+    const monto = parseFloat(montoRaw);
+    const tasaMensual = parseFloat(tasaRaw) / 100;
+    const plazoPactado = parseInt(plazoRaw);
+    const valorPrima = parseFloat(valorPrimaRaw) || 0;
+
+    if (monto <= 0 || tasaMensual < 0 || plazoPactado <= 0) {
+        alert("Por favor, ingresa valores válidos mayores a cero.");
+        return;
+    }
+
+    // Fórmula PMT / PAGO (Sistema Francés)
     let cuotaFijaBase = 0;
     if (tasaMensual === 0) {
         cuotaFijaBase = monto / plazoPactado;
@@ -23,7 +38,6 @@ function generarPlanPagos() {
         cuotaFijaBase = (monto * tasaMensual * Math.pow(1 + tasaMensual, plazoPactado)) / (Math.pow(1 + tasaMensual, plazoPactado) - 1);
     }
 
-    // Inicialización de variables de control
     let saldoInicial = monto;
     let totalCuotas = 0;
     let totalPrimas = 0;
@@ -31,9 +45,8 @@ function generarPlanPagos() {
     let totalCapital = 0;
     let plazoReal = 0;
     
-    cachePlanPagos = []; // Reset de caché
+    cachePlanPagos = [];
 
-    // Ciclo de Amortización
     for (let mes = 1; mes <= plazoPactado; mes++) {
         if (saldoInicial <= 0) break;
 
@@ -43,7 +56,6 @@ function generarPlanPagos() {
         let abonoCapital = 0;
         let saldoPendiente = 0;
 
-        // Validación de última cuota para evitar saldos huérfanos
         if ((saldoInicial + interesMes) <= cuotaFijaBase) {
             cuotaMes = saldoInicial + interesMes;
             primaMes = 0;
@@ -70,7 +82,6 @@ function generarPlanPagos() {
             avance: avancePct
         });
 
-        // Sumatorias parciales
         totalCuotas += cuotaMes;
         totalPrimas += primaMes;
         totalIntereses += interesMes;
@@ -80,10 +91,8 @@ function generarPlanPagos() {
         saldoInicial = saldoPendiente;
     }
 
-    // Guardar totales globales para Excel
     variablesGlobales = { monto, tasaMensual, plazoReal, totalIntereses, totalCuotas, totalPrimas, totalCapital };
 
-    // Renderizar la información en el DOM (HTML)
     renderizarInterfaz();
 }
 
@@ -92,13 +101,13 @@ function formatearMoneda(valor) {
 }
 
 function renderizarInterfaz() {
-    // 1. Actualizar Tarjetas KPI
+    // 1. Actualizar KPIs
     document.getElementById("kpi-cuota").innerText = formatearMoneda(variablesGlobales.totalCuotas / variablesGlobales.plazoReal);
     document.getElementById("kpi-plazo").innerText = `${variablesGlobales.plazoReal} meses`;
     document.getElementById("kpi-intereses").innerText = formatearMoneda(variablesGlobales.totalIntereses);
     document.getElementById("kpi-total").innerText = formatearMoneda(variablesGlobales.totalCuotas + variablesGlobales.totalPrimas);
 
-    // 2. Llenar el cuerpo de la tabla
+    // 2. Renderizar Cuerpo de la Tabla
     const tbody = document.getElementById("tabla-cuerpo");
     tbody.innerHTML = "";
 
@@ -115,7 +124,7 @@ function renderizarInterfaz() {
             <td class="py-1.5 px-1 text-right text-sky-600">${formatearMoneda(p.abono_capital)}</td>
             <td class="py-1.5 px-1 text-right text-slate-900 font-semibold">${formatearMoneda(p.saldo_pendiente)}</td>
             <td class="py-1.5 px-1 text-center font-mono text-[10px] text-slate-500">
-                <span class="inline-block px-1 py-0.2 rounded ${p.avance >= 100 ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100'}">
+                <span class="inline-block px-1 py-0.2 rounded <?php echo $p['avance'] >= 100 ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100'; ?>">
                     ${p.avance.toFixed(1)}%
                 </span>
             </td>
@@ -123,7 +132,7 @@ function renderizarInterfaz() {
         tbody.appendChild(fila);
     });
 
-    // 3. Llenar el pie de la tabla con los totales concluyentes
+    // 3. Renderizar Pie de la Tabla
     const tfoot = document.getElementById("tabla-pie");
     tfoot.innerHTML = `
         <td class="py-2 px-1 text-center text-[10px]">TOTAL</td>
@@ -137,8 +146,12 @@ function renderizarInterfaz() {
     `;
 }
 
-// 3. EXPORTACIÓN NATIVA A EXCEL DESDE EL NAVEGADOR
 function exportarExcel() {
+    if (!cachePlanPagos || cachePlanPagos.length === 0) {
+        alert("No hay datos generados para exportar. Calcula un plan de pagos primero.");
+        return;
+    }
+
     let htmlTemplate = `
     <meta http-equiv="content-type" content="application/vnd.ms-excel; charset=UTF-8">
     <table border="1">
@@ -183,12 +196,11 @@ function exportarExcel() {
         </tbody>
     </table>`;
 
-    // Crear un enlace temporal de descarga en el navegador
     const blob = new Blob([htmlTemplate], { type: "application/vnd.ms-excel" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "Plan_Amortizacion_Javascript.xls";
+    a.download = "Plan_Amortizacion.xls";
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

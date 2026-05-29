@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador de Crédito Ajustado - GitHub Pages</title>
+    <title>Simulador de Crédito Responsivo - GitHub Pages</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
         /* Ajustes críticos para la exportación a PDF e Impresión limpia sin desbordes */
@@ -28,16 +28,16 @@
 
     <header class="bg-slate-900 text-white py-4 px-4 mb-6 shadow-md no-print">
         <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
-            <div>
+            <div class="text-center sm:text-left">
                 <h1 class="text-xl font-bold tracking-tight">Simulador Financiero Pro</h1>
-                <p class="text-slate-400 text-xs">Versión Estática para GitHub Pages (JavaScript)</p>
+                <p class="text-slate-400 text-xs">Diseño Móvil Responsivo & GitHub Pages</p>
             </div>
-            <div class="flex gap-2">
-                <button onclick="exportarExcel();" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition shadow-sm cursor-pointer">
-                    📊 Exportar Excel
+            <div class="flex gap-2 w-full sm:w-auto justify-center">
+                <button onclick="exportarExcel();" class="flex-1 sm:flex-none text-center bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-xs font-semibold transition shadow-sm cursor-pointer">
+                    📊 Excel
                 </button>
-                <button onclick="window.print();" class="bg-sky-600 hover:bg-sky-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition shadow-sm cursor-pointer">
-                    📄 Exportar PDF / Imprimir
+                <button onclick="window.print();" class="flex-1 sm:flex-none text-center bg-sky-600 hover:bg-sky-700 text-white px-3 py-2 rounded-lg text-xs font-semibold transition shadow-sm cursor-pointer">
+                    📄 PDF / Imprimir
                 </button>
             </div>
         </div>
@@ -51,32 +51,32 @@
                 <div class="space-y-3.5">
                     <div>
                         <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Monto Solicitado (COP)</label>
-                        <input type="number" id="monto" value="40000000" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5 text-slate-900 font-medium text-sm focus:outline-sky-500">
+                        <input type="number" id="monto" placeholder="Ej: 40000000" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-900 font-medium text-sm focus:outline-sky-500 focus:bg-white">
                     </div>
                     
                     <div>
                         <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Tasa de Interés Mensual (%)</label>
-                        <input type="number" step="0.01" id="tasa" value="2.00" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5 text-slate-900 font-medium text-sm focus:outline-sky-500">
+                        <input type="number" step="0.01" id="tasa" placeholder="Ej: 2.0" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-900 font-medium text-sm focus:outline-sky-500 focus:bg-white">
                     </div>
                     
                     <div>
                         <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Plazo Solicitado (Meses)</label>
-                        <input type="number" id="plazo" value="48" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5 text-slate-900 font-medium text-sm focus:outline-sky-500">
+                        <input type="number" id="plazo" placeholder="Ej: 48" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-900 font-medium text-sm focus:outline-sky-500 focus:bg-white">
                     </div>
 
                     <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200">
                         <div class="flex items-center justify-between mb-2">
                             <label for="aplicar_primas" class="text-xs font-bold text-slate-700 cursor-pointer">Inyectar Primas Semestrales</label>
-                            <input type="checkbox" id="aplicar_primas" checked class="w-4 h-4 text-sky-600 border-slate-300 rounded cursor-pointer">
+                            <input type="checkbox" id="aplicar_primas" class="w-4 h-4 text-sky-600 border-slate-300 rounded cursor-pointer">
                         </div>
                         <div>
                             <label class="block text-[10px] font-semibold text-slate-400 uppercase mb-1">Valor Extra de la Prima ($)</label>
-                            <input type="number" id="prima" value="600000" class="w-full bg-white border border-slate-300 rounded-md px-2.5 py-1 text-slate-900 font-medium text-xs focus:outline-sky-500">
+                            <input type="number" id="prima" placeholder="Ej: 600000" class="w-full bg-white border border-slate-300 rounded-md px-2.5 py-1.5 text-slate-900 font-medium text-xs focus:outline-sky-500">
                         </div>
                     </div>
 
-                    <button onclick="generarPlanPagos();" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2 px-4 rounded-lg text-sm transition shadow-md cursor-pointer">
-                        🔄 Recalcular Plan
+                    <button onclick="generarPlanPagos();" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 px-4 rounded-lg text-sm transition shadow-md cursor-pointer">
+                        🔄 Calcular Plan de Pagos
                     </button>
                 </div>
             </div>
@@ -105,26 +105,31 @@
 
             <div class="bg-white rounded-xl shadow-xs border border-slate-200 overflow-hidden print-card">
                 <div class="px-4 py-2.5 bg-slate-900 text-white flex justify-between items-center no-print">
-                    <h3 class="text-xs font-bold">Tabla de Amortización Dinámica</h3>
-                    <span class="text-[10px] bg-slate-700 text-slate-300 px-1.5 py-0.5 rounded font-mono">JavaScript Activo</span>
+                    <h3 class="text-xs font-bold">Tabla de Amortización</h3>
+                    <span class="text-[10px] bg-slate-700 text-slate-300 px-1.5 py-0.5 rounded font-mono">Mobile-Friendly</span>
                 </div>
                 
-                <div class="w-full">
-                    <table class="w-full border-collapse table-fixed text-[11px]" id="tabla-amortizacion">
+                <div class="w-full overflow-x-auto block">
+                    <table class="w-full border-collapse min-w-[640px] lg:min-w-0 lg:table-fixed text-[11px]" id="tabla-amortizacion">
                         <thead>
                             <tr class="bg-slate-100 text-slate-500 font-bold uppercase border-b border-slate-200 text-[10px]">
-                                <th class="py-2 px-1 text-center w-[6%]">Mes</th>
-                                <th class="py-2 px-1 text-right w-[14%]">Saldo Ini.</th>
-                                <th class="py-2 px-1 text-right w-[13%]">Cuota Fija</th>
-                                <th class="py-2 px-1 text-right w-[13%]">Extra (Prima)</th>
-                                <th class="py-2 px-1 text-right w-[12%]">Intereses</th>
-                                <th class="py-2 px-1 text-right w-[13%]">Abono Cap.</th>
-                                <th class="py-2 px-1 text-right w-[15%]">Saldo Pend.</th>
-                                <th class="py-2 px-1 text-center w-[14%]">% Avance</th>
+                                <th class="py-2 px-1 text-center lg:w-[6%]">Mes</th>
+                                <th class="py-2 px-1 text-right lg:w-[14%]">Saldo Ini.</th>
+                                <th class="py-2 px-1 text-right lg:w-[13%]">Cuota Fija</th>
+                                <th class="py-2 px-1 text-right lg:w-[13%]">Extra (Prima)</th>
+                                <th class="py-2 px-1 text-right lg:w-[12%]">Intereses</th>
+                                <th class="py-2 px-1 text-right lg:w-[13%]">Abono Cap.</th>
+                                <th class="py-2 px-1 text-right lg:w-[15%]">Saldo Pend.</th>
+                                <th class="py-2 px-1 text-center lg:w-[14%]">% Avance</th>
                             </tr>
                         </thead>
                         <tbody id="tabla-cuerpo" class="divide-y divide-slate-100 font-medium">
-                            </tbody>
+                            <tr>
+                                <td colspan="8" class="text-center py-8 text-slate-400 font-medium">
+                                    Ingresa las variables en el formulario y haz clic en "Calcular Plan de Pagos"
+                                </td>
+                            </tr>
+                        </tbody>
                         <tfoot>
                             <tr class="bg-slate-800 text-white font-bold border-t border-slate-700 text-[11px]" id="tabla-pie">
                                 </tr>
